@@ -1,33 +1,21 @@
 # ADE — Agent Development Environment
 
-> One workspace, every device, every agent.
+同一个 workspace，在电脑、手机和 Pad 上继续工作。ADE 把文件、Agent 进程和任务记录保留在运行服务端的机器上；浏览器提供文件树、Monaco 编辑器、任务对话和交互式终端。Codex、Claude Code、Pi 等 CLI 作为可配置的 Agent 在这个 workspace 中运行，不需要在每台设备上复制项目。
 
-ADE is **not** a chat app. It is a development environment that lives on a server
-(or your own PC): the workspace (files, processes, tasks) has a single copy, and
-your desktop / phone / tablet are just screens onto it. Agents — **Codex**,
-**Claude Code**, **Pi**, anything with a CLI — run as managed processes inside
-that workspace, and every task is captured as an append-only event stream.
+**当前定位：** 单用户、自托管的开发中项目。可用功能包括跨设备查看任务、实时输出、文件编辑与冲突提示、Agent 接力和顺序链、Git 改动预览与整文件暂存。尚不具备多用户隔离、完整的 Agent 原生审批、并行 worktree 或离线编辑；不要将服务直接暴露到公网。
 
-```
-   PC 浏览器 / 桌面壳        手机 PWA            Pad
-   编辑器 + chat + 任务       chat + 任务 + 审批    分屏工作台
-        └─────────────┬──────────────┘
-                      │ HTTPS + WebSocket
-        ┌─────────────▼──────────────┐
-        │  ADE Server                │
-        │  auth · REST API · WS 广播  │
-        ├────────────────────────────┤
-        │  文件服务 + watcher          │
-        │  Monaco 编辑后端             │
-        │  Agent 进程管理 (pipes + PTY)│
-        │    ├ codex                 │
-        │    ├ claude                │
-        │    └ pi                    │
-        │  事件存储 (JSONL, 追加式)    │
-        └────────────────────────────┘
+## 快速开始
+
+需要 Node.js 20.19+ 或 22.12+、npm；真实 Agent 还需在服务端安装相应 CLI 并完成认证。
+
+```bash
+npm install
+npm run dev
 ```
 
-## Status — M0 skeleton + interactive terminal
+打开 `http://localhost:5173`。先选择 `Demo` 提交任务体验输出，再按需配置真实 Agent；`Terminal Demo` 可测试共享终端。默认 workspace 是项目下的 `workspace/`，服务端 API 在 `http://localhost:8787`。详细说明见[生产模式](#运行与部署)、[手机与平板访问](#access-from-phone--tablet)和 [Agent 配置](#agents)。
+
+## 已实现功能
 
 - [x] Monorepo: `shared` (types/events) · `server` · `web`
 - [x] REST: file tree / read / write, agents, task dispatch / abort / replay
@@ -105,18 +93,10 @@ are not exposed yet. Revision checks serialize
 ADE requests, but do not lock out unrelated local processes changing the same
 paths concurrently; on Windows, Node does not provide `O_NOFOLLOW`.
 
-## Quickstart
+## 运行与部署
 
-```bash
-npm install
-npm run dev        # server on :8787 (tsx watch) + web on :5173 (vite)
-```
-
-Open http://localhost:5173 — dispatch a task to `Demo` to see the full loop,
-then select `Codex` or `Claude Code` (CLIs must be in the server's PATH).
-Select `Terminal Demo` to try a shared interactive terminal; type `exit` to finish.
-
-Single-port production mode (serves the built web UI from the server):
+开发模式：`npm run dev` 启动服务端（端口 8787）和 Vite（端口 5173）。
+生产模式在服务端提供构建后的 Web 界面：
 
 ```bash
 npm run build
