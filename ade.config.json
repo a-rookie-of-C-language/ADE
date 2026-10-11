@@ -15,10 +15,24 @@
       ]
     },
     {
+      "id": "terminal-demo",
+      "label": "Terminal Demo",
+      "description": "Interactive PTY smoke test: type exit to finish",
+      "mode": "pty",
+      "command": ["node", "-e", "process.stdout.write(\"READY: type exit to finish\\r\\n\"); process.stdin.on(\"data\", d => { process.stdout.write(\"received: \" + d); if (d.toString().trim() === \"exit\") process.exit(0) })"]
+    },
+    {
       "id": "codex",
       "label": "Codex",
       "description": "OpenAI Codex CLI (requires `codex` in PATH)",
       "command": ["codex", "exec", "--", "{{prompt}}"]
+    },
+    {
+      "id": "codex-terminal",
+      "label": "Codex Terminal",
+      "description": "Interactive Codex CLI in a persistent PTY",
+      "mode": "pty",
+      "command": ["codex", "{{prompt}}"]
     },
     {
       "id": "claude",
@@ -29,8 +43,9 @@
     {
       "id": "pi",
       "label": "Pi",
-      "description": "Pi agent — adjust the command to your install",
-      "command": ["pi", "{{prompt}}"]
+      "description": "Pi coding agent CLI (requires `pi` in PATH and configured credentials)",
+      "command": ["pi", "--print"],
+      "stdin": "prompt"
     }
   ]
 }

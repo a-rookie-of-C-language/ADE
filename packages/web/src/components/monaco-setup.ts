@@ -16,6 +16,32 @@ import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
 
 loader.config({ monaco });
 
+monaco.editor.defineTheme('ade-dark', {
+  base: 'vs-dark',
+  inherit: true,
+  rules: [
+    { token: 'comment', foreground: '81948C' },
+    { token: 'keyword', foreground: '8AB7FA' },
+    { token: 'string', foreground: 'A9D9A1' },
+    { token: 'number', foreground: 'F2C078' },
+  ],
+  colors: {
+    'editor.background': '#111718',
+    'editor.foreground': '#E7EDEB',
+    'editor.lineHighlightBackground': '#1D2827',
+    'editorLineNumber.foreground': '#7F918B',
+    'editorLineNumber.activeForeground': '#C8D9D1',
+    'editorCursor.foreground': '#78DFB9',
+    'editor.selectionBackground': '#315E57',
+    'editor.inactiveSelectionBackground': '#29423F',
+    'editorWidget.background': '#1D2425',
+    'editorWidget.border': '#354041',
+    'editorGutter.background': '#111718',
+    'diffEditor.insertedTextBackground': '#254D3933',
+    'diffEditor.removedTextBackground': '#81454733',
+  },
+});
+
 export function languageForPath(path: string): string {
   const ext = path.split('.').pop()?.toLowerCase() ?? '';
   const map: Record<string, string> = {

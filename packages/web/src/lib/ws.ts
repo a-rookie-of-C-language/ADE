@@ -1,11 +1,15 @@
-import type { ServerMessage } from '@ade/shared';
+import type { ClientMessage, ServerMessage } from '@ade/shared';
 
 export type WsStatus = 'connecting' | 'open' | 'closed';
+export interface WsConnection {
+  close(): void;
+  send(message: ClientMessage): boolean;
+}
 
 export function connectWs(
   onMessage: (message: ServerMessage) => void,
   onStatus: (status: WsStatus) => void,
-): () => void {
+): WsConnection {
   let socket: WebSocket | null = null;
   let closedByUser = false;
   let retries = 0;
@@ -14,7 +18,7 @@ export function connectWs(
   const url = (): string => {
     const dev = import.meta.env.DEV;
     const proto = dev ? 'ws' : location.protocol === 'https:' ? 'wss' : 'ws';
-    const host = dev ? '127.0.0.1:8787' : location.host;
+    const host = dev ? `${location.hostname}:8787` : location.host;
     const token = localStorage.getItem('ade-token');
     return `${proto}://${host}/ws${token ? `?token=${encodeURIComponent(token)}` : ''}`;
   };
@@ -44,9 +48,16 @@ export function connectWs(
 
   open();
 
-  return () => {
-    closedByUser = true;
-    if (timer !== undefined) clearTimeout(timer);
-    socket?.close();
+  return {
+    close() {
+      closedByUser = true;
+      if (timer !== undefined) clearTimeout(timer);
+      socket?.close();
+    },
+    send(message) {
+      if (socket?.readyState !== WebSocket.OPEN) return false;
+      socket.send(JSON.stringify(message));
+      return true;
+    },
   };
 }
