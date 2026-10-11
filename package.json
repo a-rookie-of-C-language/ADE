@@ -1,0 +1,24 @@
+{
+  "name": "ade",
+  "private": true,
+  "version": "0.1.0",
+  "description": "ADE — Agent Development Environment: one workspace, every device, every agent.",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build:shared": "npm run build -w @ade/shared",
+    "build": "npm run build -w @ade/shared && npm run build -w @ade/server && npm run build -w @ade/web",
+    "dev": "npm run build:shared && concurrently -n server,web -c blue,green \"npm:dev -w @ade/server\" \"npm:dev -w @ade/web\"",
+    "start": "node packages/server/dist/index.js",
+    "smoke": "node packages/server/scripts/smoke.mjs",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

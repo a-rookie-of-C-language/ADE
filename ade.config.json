@@ -1,0 +1,36 @@
+{
+  "workspaceRoot": "./workspace",
+  "port": 8787,
+  "host": "127.0.0.1",
+  "agents": [
+    {
+      "id": "demo",
+      "label": "Demo",
+      "description": "Simulated agent — always available, useful for smoke tests",
+      "command": [
+        "node",
+        "-e",
+        "const prompt = process.argv.slice(1).join(' ');\nconsole.log('[demo] task received:', prompt);\nlet i = 0;\nconst timer = setInterval(() => {\n  i += 1;\n  console.log(`[demo] step ${i}/5 — ${prompt}`);\n  if (i >= 5) { clearInterval(timer); console.log('[demo] done'); }\n}, 300);",
+        "{{prompt}}"
+      ]
+    },
+    {
+      "id": "codex",
+      "label": "Codex",
+      "description": "OpenAI Codex CLI (requires `codex` in PATH)",
+      "command": ["codex", "exec", "--", "{{prompt}}"]
+    },
+    {
+      "id": "claude",
+      "label": "Claude Code",
+      "description": "Anthropic Claude Code CLI (requires `claude` in PATH)",
+      "command": ["claude", "-p", "{{prompt}}"]
+    },
+    {
+      "id": "pi",
+      "label": "Pi",
+      "description": "Pi agent — adjust the command to your install",
+      "command": ["pi", "{{prompt}}"]
+    }
+  ]
+}
